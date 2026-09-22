@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>สุ่มแบ่งทีม</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2230%22%20fill%3D%22%232f7fe6%22%2F%3E%3Cg%20fill%3D%22%233ccf7a%22%3E%3Cpath%20d%3D%22M14%2018c6-6%2014-4%2018%200s2%2010-4%2012-10%208-6%2014-8%208-12%202%200-22%204-28z%22%2F%3E%3Cpath%20d%3D%22M40%2010c8%200%2014%206%2016%2014s-4%208-8%206-8%204-12%200%202-8%200-12%200-8%204-8z%22%2F%3E%3Cpath%20d%3D%22M44%2040c6%200%2010%204%208%2010s-8%208-14%206-6-6-2-10%204-6%208-6z%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.5%22%20stroke-width%3D%222%22%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2232%22%20rx%3D%2212%22%20ry%3D%2230%22%2F%3E%3Cpath%20d%3D%22M2%2032h60%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <meta name="description" content="สุ่มแบ่งรายชื่อเป็นทีมอย่างยุติธรรม รองรับปรับสมดุลทักษะ คู่ห้ามอยู่ด้วยกัน คู่บังคับ เลือกหัวหน้าทีม ทำงานบนเบราว์เซอร์ทั้งหมด">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -35,7 +36,8 @@ body{
 }
 .wrap{max-width:960px; margin:0 auto; padding:28px 16px 64px}
 header{margin-bottom:20px}
-h1{font-size:28px; margin:0 0 4px; letter-spacing:-.01em}
+h1{display:flex; align-items:center; gap:12px; font-size:28px; margin:0 0 6px; letter-spacing:-.01em}
+.logo{width:44px; height:44px; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(0,0,0,.15))}
 .sub{color:var(--muted); margin:0}
 .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:16px}
 label.block{display:block; font-weight:600; margin-bottom:8px}
@@ -146,7 +148,25 @@ footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
 <body>
 <div class="wrap">
   <header>
-    <h1>🎲 สุ่มแบ่งทีม</h1>
+    <h1><svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="gSea" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fa3ff"/><stop offset="1" stop-color="#1d5fd6"/></linearGradient>
+        <clipPath id="gClip"><circle cx="32" cy="32" r="28"/></clipPath>
+      </defs>
+      <circle cx="32" cy="32" r="28" fill="url(#gSea)"/>
+      <g clip-path="url(#gClip)" fill="#3ccf7a">
+        <path d="M14 18c6-6 14-4 18 0s2 10-4 12-10 8-6 14-8 8-12 2 0-22 4-28z"/>
+        <path d="M40 10c8 0 14 6 16 14s-4 8-8 6-8 4-12 0 2-8 0-12 0-8 4-8z"/>
+        <path d="M44 40c6 0 10 4 8 10s-8 8-14 6-6-6-2-10 4-6 8-6z"/>
+      </g>
+      <g fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.6" clip-path="url(#gClip)">
+        <ellipse cx="32" cy="32" rx="12" ry="28"/>
+        <ellipse cx="32" cy="32" rx="24" ry="28"/>
+        <path d="M4 32h56M8 18h48M8 46h48"/>
+      </g>
+      <circle cx="32" cy="32" r="28" fill="none" stroke="#1a4fb8" stroke-width="2"/>
+      <circle cx="22" cy="20" r="7" fill="#fff" opacity=".18"/>
+    </svg><span>สุ่มแบ่งทีม</span></h1>
     <p class="sub">แบ่งรายชื่อเป็นทีมแบบสุ่มและยุติธรรม รองรับปรับสมดุลทักษะ คู่ห้ามอยู่ด้วยกัน คู่บังคับ และเลือกหัวหน้าทีม — ข้อมูลอยู่ในเบราว์เซอร์ของคุณเท่านั้น</p>
   </header>
 
