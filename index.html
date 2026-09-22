@@ -362,7 +362,6 @@ footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
   <section class="panel" id="drawStage">
     <div class="draw-head">
       <h2>🏆 พิธีจับฉลาก</h2>
-      <span class="step" id="drawPhase" style="margin-left:0; color:#ffd76a"></span>
       <span class="step" id="drawStep">0 / 0</span>
     </div>
     <div class="arena" id="arena">
@@ -824,7 +823,7 @@ $('#btnAgain').onclick = () => run('instant');
 
 /* ---------- โหมดจับฉลาก ---------- */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const draw = { queue: [], i: 0, auto: false, busy: false, sound: true, caps: 0 };
+const draw = { queue: [], i: 0, auto: false, busy: false, sound: true };
 let audio = null;
 function beep(freq, dur, type = 'sine') {
   if (!draw.sound) return;
@@ -845,20 +844,23 @@ const centerIn = el => {
 const place = (el, p) => { el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, -50%)`; };
 
 function renderBoard() {
+  const capSet = new Set(state.result.caps || []);
   $('#board').innerHTML = state.result.teams.map(t => `
     <div class="gcol">
       <div class="gh" style="background:${t.color}">${esc(t.name)}</div>
       ${t.members.map((_, i) => `<div class="gslot"><span class="n">${i + 1}</span><span class="v">—</span></div>`).join('')}
     </div>`).join('');
+  // หัวหน้าทีมที่เลือกไว้ ลงช่องแรกของทีมตัวเองทันที ไม่ต้องจับ
+  state.result.teams.forEach((t, ti) => {
+    const cap = t.members.find(n => capSet.has(n));
+    if (cap) fillSlot($('#board').children[ti].querySelector('.gslot'), { n: cap, ti });
+  });
 }
 function renderBowl() {
   const left = draw.queue.length - draw.i;
   $('#bowl').innerHTML = Array.from({ length: left }, () => '<span class="mini"></span>').join('') +
     `<span class="left">เหลือ ${left} ใบ</span>`;
   $('#drawStep').textContent = `${draw.i} / ${draw.queue.length}`;
-  $('#drawPhase').textContent = draw.caps
-    ? (draw.i < draw.caps ? '👑 รอบหัวหน้าทีม ' + (draw.i + 1) + '/' + draw.caps : 'รอบสมาชิก')
-    : '';
   const done = draw.i >= draw.queue.length;
   $('#btnDrawOne').disabled = done; $('#btnAuto').disabled = done; $('#btnSkip').disabled = done;
 }
@@ -866,11 +868,8 @@ function startDraw() {
   const r = state.result;
   $('#drawStage').style.display = 'block';
   const capSet = new Set(r.caps || []);
-  const capQ = shuffle(r.teams.map((t, ti) => ({ n: t.members.find(n => capSet.has(n)), ti })).filter(x => x.n));
-  const rest = shuffle(r.teams.flatMap((t, ti) => t.members.filter(n => !capSet.has(n)).map(n => ({ n, ti }))));
-  draw.queue = [...capQ, ...rest]; draw.caps = capQ.length;
+  draw.queue = shuffle(r.teams.flatMap((t, ti) => t.members.filter(n => !capSet.has(n)).map(n => ({ n, ti }))));
   draw.i = 0; draw.auto = false; draw.busy = false;
-  $('#drawStage').classList.toggle('capround', draw.caps > 0);
   $('#btnAuto').textContent = '▶️ เล่นอัตโนมัติ';
   $('#podiumTop').textContent = 'กดที่โถเพื่อจับฉลาก';
   $('#token').style.display = 'none';
@@ -895,9 +894,6 @@ async function drawOne() {
   tok.className = 'token'; tok.style.display = 'flex';
   tok.querySelector('.ball').textContent = draw.i + 1;
   tok.querySelector('.card').textContent = item.n;
-  const isCapTurn = draw.i < draw.caps;
-  tok.classList.toggle('cap', isCapTurn);
-  if (isCapTurn) tok.querySelector('.card').textContent = '👑 ' + item.n;
   place(tok, centerIn(bowl));
   await sleep(40);
   tok.classList.add('move');
