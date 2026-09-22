@@ -66,6 +66,7 @@ button.primary{
   font-size:17px; font-weight:600; padding:15px; border-radius:14px; margin-top:16px;
 }
 button.primary:hover{opacity:.9}
+button.primary.alt{background:linear-gradient(120deg,#123a86,#2d6ad4); color:#fff; border-color:transparent; margin-top:10px}
 button:disabled{opacity:.5; cursor:not-allowed}
 .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
 .seg{display:inline-flex; background:var(--soft); border-radius:12px; padding:4px; gap:4px}
@@ -113,6 +114,79 @@ details.adv[open] summary::after{content:" ▴"}
 }
 .msg{margin-top:12px; padding:10px 14px; border-radius:10px; font-size:14px; display:none}
 .msg.warn{display:block; background:var(--danger-soft); color:var(--danger)}
+/* ===== โหมดจับฉลาก (พิธีจับสลาก) ===== */
+#drawStage{
+  display:none; position:relative; overflow:hidden; color:#eaf0ff;
+  background:radial-gradient(130% 95% at 50% -15%, #24509c 0%, #12274f 50%, #08142f 100%);
+  border-color:#24407e;
+}
+#drawStage::before{content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(55% 38% at 50% 0%, rgba(255,255,255,.14), transparent 72%)}
+.draw-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; position:relative; margin-bottom:4px}
+.draw-head h2{margin:0; font-size:19px}
+.draw-head .step{margin-left:auto; font-size:13px; color:#a9bce6}
+#drawStage button{background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.22); color:#eaf0ff}
+#drawStage button:hover{background:rgba(255,255,255,.2)}
+#drawStage button:disabled{opacity:.4}
+.arena{position:relative}
+.stage{display:flex; align-items:flex-end; justify-content:center; gap:34px; flex-wrap:wrap; padding:16px 0 18px; min-height:220px}
+.bowl{
+  width:152px; height:152px; border-radius:50%; position:relative; cursor:pointer; padding:20px;
+  display:flex; flex-wrap:wrap; align-content:center; justify-content:center; gap:5px;
+  background:linear-gradient(160deg, rgba(255,255,255,.26), rgba(255,255,255,.05) 45%, rgba(0,0,0,.3));
+  border:2px solid rgba(255,255,255,.38);
+  box-shadow:inset 0 -20px 34px rgba(0,0,0,.4), 0 12px 26px rgba(0,0,0,.4);
+  transition:transform .2s;
+}
+.bowl:hover{transform:translateY(-3px)}
+.bowl.shake{animation:bowlshake .45s ease-in-out}
+@keyframes bowlshake{
+  0%,100%{transform:rotate(0) translateY(0)} 20%{transform:rotate(-7deg) translateY(-4px)}
+  45%{transform:rotate(6deg) translateY(-2px)} 70%{transform:rotate(-4deg) translateY(-3px)}
+}
+.bowl .mini{width:15px; height:15px; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.45);
+  background:radial-gradient(circle at 34% 30%, #fffbe8, #efc84d 55%, #a87c16)}
+.bowl .left{position:absolute; left:0; right:0; bottom:-24px; text-align:center; font-size:12px; color:#a9bce6}
+.podium{display:flex; flex-direction:column; align-items:center; width:170px}
+.podium .top{width:100%; height:96px; display:flex; align-items:center; justify-content:center;
+  font-size:13px; color:#8ea3d2; text-align:center}
+.stand-plate{width:130px; height:14px; border-radius:8px 8px 4px 4px; background:linear-gradient(#f0dc9a,#a8863a); box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.stand-neck{width:22px; height:40px; background:linear-gradient(#d3b76b,#8a6c26)}
+.stand-base{width:150px; height:14px; border-radius:10px; background:linear-gradient(#c6a751,#6e5518)}
+.token{position:absolute; left:0; top:0; z-index:6; display:none; align-items:center; justify-content:center; pointer-events:none}
+.token.move{transition:transform .7s cubic-bezier(.22,.85,.3,1)}
+.token .ball,.token .card{position:absolute; transition:transform .45s cubic-bezier(.3,1.4,.5,1), opacity .35s}
+.token .ball{width:62px; height:62px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:18px; color:#6b5210; box-shadow:0 10px 22px rgba(0,0,0,.5);
+  background:radial-gradient(circle at 32% 26%, #fffdf2, #f3cd55 52%, #a87c16)}
+.token .card{
+  min-width:170px; max-width:240px; padding:12px 18px; border-radius:12px; text-align:center; font-weight:600; font-size:17px;
+  color:#22305a; background:linear-gradient(#ffffff,#eef3ff); box-shadow:0 12px 28px rgba(0,0,0,.45);
+  opacity:0; transform:scale(.3) rotateY(90deg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.token.cap .ball{background:radial-gradient(circle at 32% 26%, #fff4c9, #ffc32e 52%, #9a6a05); box-shadow:0 10px 26px rgba(255,190,60,.45)}
+.token.cap .card{background:linear-gradient(#fff8e2,#ffe9a8); color:#5a4300}
+.token.reveal .ball{opacity:0; transform:scale(.2) rotate(140deg)}
+.token.reveal .card{opacity:1; transform:scale(1) rotateY(0)}
+.token.shrink .card{transform:scale(.45); opacity:.15}
+.board{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; position:relative}
+.gcol{border-radius:12px; overflow:hidden; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); transition:box-shadow .25s}
+.gcol.hot{box-shadow:0 0 0 2px #ffd76a, 0 10px 26px rgba(255,215,106,.3)}
+.gcol .gh{padding:8px 12px; font-weight:600; font-size:14px; color:#fff}
+.gslot{display:flex; align-items:center; gap:8px; min-height:36px; padding:7px 10px; font-size:14px;
+  color:#93a6d0; border-top:1px solid rgba(255,255,255,.09)}
+.gslot .n{font-size:11px; color:#7f93c4; width:14px; flex-shrink:0}
+.gslot .v{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.gslot.filled{color:#fff}
+.gslot.pop{animation:slotpop .5s ease}
+@keyframes slotpop{0%{background:rgba(255,215,106,.55)} 100%{background:transparent}}
+.draw-ctrl{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:4px 0 16px}
+@media (max-width:520px){
+  .stage{gap:16px; padding-bottom:26px}
+  .bowl{width:120px; height:120px; padding:14px}
+  .podium{width:150px}
+  .token .card{min-width:140px; font-size:15px}
+}
 /* results */
 #results{display:none}
 .res-head{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px}
@@ -173,7 +247,7 @@ footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
   <section class="panel">
     <label class="block" for="names">รายชื่อสมาชิก <span class="hint" style="display:inline;font-weight:400">(บรรทัดละ 1 คน)</span></label>
     <textarea id="names" placeholder="สมชาย ใจดี&#10;สมหญิง รักดี&#10;มานะ ขยัน&#10;…&#10;&#10;ใส่ระดับทักษะต่อท้ายได้ เช่น  สมชาย ใจดี, 4" spellcheck="false"></textarea>
-    <div class="hint">เคล็ดลับ: พิมพ์ <code>ชื่อ, 4</code> เพื่อกำหนดระดับทักษะ 1–5 ไปพร้อมกัน</div>
+    <div class="hint">เคล็ดลับ: วางหลายชื่อในบรรทัดเดียว คั่นด้วยจุลภาคได้ · พิมพ์ <code>ชื่อ: 4</code> เพื่อกำหนดระดับทักษะ 1–5</div>
     <div class="toolbar">
       <span class="pill">จำนวน: <b id="count">0</b> คน<span id="dup"></span></span>
       <span class="spacer"></span>
@@ -227,6 +301,18 @@ footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
         </div>
       </div>
 
+      <div class="opt" id="optCap">
+        <div class="opt-head">
+          <input type="checkbox" id="chkCap">
+          <label for="chkCap">กำหนดหัวหน้าทีมเอง</label>
+          <span class="desc">ระบุได้ว่าใครคุมทีมไหน ที่เหลือสุ่ม · จับฉลากรอบแรก</span>
+        </div>
+        <div class="opt-body">
+          <div class="hint" id="capHint" style="margin:0 0 8px">ยังไม่ได้เลือก</div>
+          <div class="skill-list" id="capList"></div>
+        </div>
+      </div>
+
       <div class="opt" id="optNG">
         <div class="opt-head">
           <input type="checkbox" id="chkNG">
@@ -270,6 +356,38 @@ footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
 
     <div class="msg" id="msg"></div>
     <button class="primary" id="btnGo">🎲 สุ่มแบ่งทีมเลย</button>
+    <button class="primary alt" id="btnDrawGo">🏆 จับฉลากทีละคน</button>
+  </section>
+
+  <section class="panel" id="drawStage">
+    <div class="draw-head">
+      <h2>🏆 พิธีจับฉลาก</h2>
+      <span class="step" id="drawPhase" style="margin-left:0; color:#ffd76a"></span>
+      <span class="step" id="drawStep">0 / 0</span>
+    </div>
+    <div class="arena" id="arena">
+      <div class="stage">
+        <div>
+          <div class="bowl" id="bowl" role="button" tabindex="0" aria-label="จับฉลาก"></div>
+          <div style="height:26px"></div>
+        </div>
+        <div class="podium">
+          <div class="top" id="podiumTop">กดที่โถเพื่อจับฉลาก</div>
+          <div class="stand-plate"></div>
+          <div class="stand-neck"></div>
+          <div class="stand-base"></div>
+        </div>
+      </div>
+      <div class="draw-ctrl">
+        <button id="btnDrawOne">🎯 จับ 1 ใบ</button>
+        <button id="btnAuto">▶️ เล่นอัตโนมัติ</button>
+        <button id="btnSkip">⏭️ ข้ามไปผลลัพธ์</button>
+        <button id="btnSound" aria-pressed="true">🔊 เสียง</button>
+        <button id="btnDrawAgain">🔄 จับใหม่</button>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="token" id="token"><span class="ball"></span><span class="card"></span></div>
+    </div>
   </section>
 
   <section class="panel" id="results">
@@ -299,6 +417,8 @@ const state = {
   mode: 'teams',        // 'teams' | 'per'
   skills: {},           // name -> 1..5
   ng: [], must: [],     // [[a,b], ...]
+  caps: [],             // หัวหน้าทีมที่เลือกเอง
+  capTeam: {},          // ชื่อหัวหน้า -> index ทีมที่ระบุไว้ (ไม่ระบุ = สุ่ม)
   result: null,
 };
 
@@ -314,14 +434,23 @@ const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } cat
 /* ---------- parse names ---------- */
 function parseNames() {
   const seen = new Set(), names = []; let dup = 0;
-  for (const raw of $('#names').value.split(/\r?\n/)) {
-    let s = raw.trim(); if (!s) continue;
-    const m = s.match(/^(.*?)\s*[,:\t]\s*([1-5])$/);
-    let name = s;
-    if (m) { name = m[1].trim(); state.skills[name] = +m[2]; }
-    if (!name) continue;
-    if (seen.has(name)) { dup++; continue; }
+  const push = raw => {
+    const v = raw.trim(); if (!v) return;
+    const m = v.match(/^(.*?)\s*[:\t]\s*([1-5])$/);
+    let name = v;
+    if (m && m[1].trim()) { name = m[1].trim(); state.skills[name] = +m[2]; }
+    if (!name) return;
+    if (seen.has(name)) { dup++; return; }
     seen.add(name); names.push(name);
+  };
+  for (const raw of $('#names').value.split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    // "ชื่อ, 4" = หนึ่งชื่อพร้อมระดับทักษะ
+    const sk = line.match(/^([^,]+?)\s*,\s*([1-5])$/);
+    if (sk) { const n = sk[1].trim(); state.skills[n] = +sk[2]; push(n); continue; }
+    // บรรทัดที่มีจุลภาค = หลายชื่อในบรรทัดเดียว
+    if (line.includes(',')) { line.split(',').forEach(push); continue; }
+    push(line);
   }
   return { names, dup };
 }
@@ -341,8 +470,13 @@ function refreshNames() {
   $('#dup').textContent = dup ? ` · ตัดชื่อซ้ำออก ${dup}` : '';
   refreshHint(names.length);
   renderSkills(names);
+  renderCaps(names);
   renderPairs('ng', names); renderPairs('must', names);
   store.set(DRAFT_KEY, snapshot());
+}
+function teamCount(N = parseNames().names.length) {
+  const v = Math.max(1, +$('#stepVal').value || 1);
+  return state.mode === 'teams' ? Math.max(1, Math.min(v, N || v)) : Math.max(1, Math.ceil(N / v) || 1);
 }
 function refreshHint(N = parseNames().names.length) {
   const v = Math.max(1, +$('#stepVal').value || 1);
@@ -355,6 +489,7 @@ function refreshHint(N = parseNames().names.length) {
     text = N ? `จะได้ ${k} ทีม ทีมละประมาณ ${v} คน` : 'ใส่รายชื่อก่อน';
   }
   $('#modeHint').textContent = text;
+  if ($('#capHint')) { capHint(); syncCapTeams(); }
 }
 
 /* ---------- UI: skills ---------- */
@@ -373,6 +508,71 @@ $('#skillList').addEventListener('click', e => {
   state.skills[name] = lv;
   row.querySelectorAll('button').forEach(x => x.classList.toggle('on', +x.dataset.lv <= lv));
   store.set(DRAFT_KEY, snapshot());
+});
+
+/* ---------- UI: หัวหน้าทีม ---------- */
+function capOptions(n) {
+  const K = teamCount(), cur = state.capTeam[n];
+  return '<option value="">สุ่มทีม</option>' +
+    Array.from({ length: K }, (_, i) => `<option value="${i}" ${cur === i ? 'selected' : ''}>${esc(teamLabel(i))}</option>`).join('');
+}
+function renderCaps(names) {
+  const box = $('#capList'), top = box.scrollTop, K = teamCount(names.length);
+  state.caps = state.caps.filter(n => names.includes(n));
+  for (const n of Object.keys(state.capTeam)) if (!state.caps.includes(n) || state.capTeam[n] >= K) delete state.capTeam[n];
+  box.innerHTML = names.length
+    ? names.map(n => {
+        const on = state.caps.includes(n);
+        return `<div class="skill-row">
+          <label style="flex:1; min-width:0; display:flex; align-items:center; gap:9px; cursor:pointer">
+            <input type="checkbox" data-cap="${esc(n)}" ${on ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--focus);flex-shrink:0">
+            <span class="nm">${esc(n)}</span>
+          </label>
+          ${on ? `<select data-capteam="${esc(n)}" style="font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);max-width:130px">${capOptions(n)}</select>` : ''}
+        </div>`;
+      }).join('')
+    : '<div class="skill-row" style="color:var(--muted)">ยังไม่มีรายชื่อ</div>';
+  box.scrollTop = top;
+  capHint();
+}
+function syncCapTeams() {
+  document.querySelectorAll('select[data-capteam]').forEach(sel => { sel.innerHTML = capOptions(sel.dataset.capteam); });
+}
+function capHint() {
+  const K = teamCount(), n = state.caps.length, pinned = Object.keys(state.capTeam).length;
+  const el = $('#capHint');
+  el.textContent = n
+    ? `เลือกแล้ว ${n} คน (ไม่เกินจำนวนทีม ${K})` + (pinned ? ` · ระบุทีมไว้ ${pinned} คน` : ' · ที่ไม่ระบุทีมจะสุ่ม')
+    : 'ติ๊กเลือกคนที่เป็นหัวหน้าทีม แล้วเลือกทีมได้ (ไม่เลือก = สุ่มทีม)';
+  el.style.color = n > K ? 'var(--danger)' : 'var(--muted)';
+}
+$('#capList').addEventListener('change', e => {
+  const c = e.target.closest('input[data-cap]');
+  if (c) {
+    const n = c.dataset.cap;
+    const row = c.closest(".skill-row"), had = row.querySelector("select[data-capteam]");
+    if (c.checked) {
+      if (!state.caps.includes(n)) state.caps.push(n);
+      if (!had) {
+        const sel = document.createElement("select");
+        sel.dataset.capteam = n;
+        sel.style.cssText = "font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);max-width:130px";
+        sel.innerHTML = capOptions(n);
+        row.appendChild(sel);
+      }
+    } else {
+      state.caps = state.caps.filter(x => x !== n); delete state.capTeam[n];
+      had?.remove();
+    }
+    capHint(); store.set(DRAFT_KEY, snapshot());
+    return;
+  }
+  const sel = e.target.closest('select[data-capteam]');
+  if (sel) {
+    const n = sel.dataset.capteam;
+    if (sel.value === '') delete state.capTeam[n]; else state.capTeam[n] = +sel.value;
+    capHint(); store.set(DRAFT_KEY, snapshot());
+  }
 });
 
 /* ---------- UI: pairs ---------- */
@@ -411,7 +611,7 @@ for (const kind of ['ng', 'must']) {
 document.querySelectorAll('.opt-head input[type=checkbox]').forEach(c => {
   c.addEventListener('change', () => { c.closest('.opt').classList.toggle('on', c.checked); store.set(DRAFT_KEY, snapshot()); });
 });
-$('#teamNames').addEventListener('input', () => store.set(DRAFT_KEY, snapshot()));
+$('#teamNames').addEventListener('input', () => { syncCapTeams(); store.set(DRAFT_KEY, snapshot()); });
 
 /* ---------- mode & stepper ---------- */
 function setMode(m) {
@@ -443,7 +643,7 @@ $('#btnClear').onclick = () => {
 /* ---------- save / load ---------- */
 function snapshot() {
   return {
-    names: $('#names').value, skills: state.skills, ng: state.ng, must: state.must,
+    names: $('#names').value, skills: state.skills, ng: state.ng, must: state.must, caps: state.caps, capTeam: state.capTeam,
     mode: state.mode, step: +$('#stepVal').value || 1,
     opts: Object.fromEntries([...document.querySelectorAll('.opt-head input')].map(c => [c.id, c.checked])),
     teamNames: $('#teamNames').value,
@@ -452,7 +652,7 @@ function snapshot() {
 function restore(s) {
   if (!s) return false;
   $('#names').value = s.names || '';
-  state.skills = s.skills || {}; state.ng = s.ng || []; state.must = s.must || [];
+  state.skills = s.skills || {}; state.ng = s.ng || []; state.must = s.must || []; state.caps = s.caps || []; state.capTeam = s.capTeam || {};
   $('#stepVal').value = s.step || 2; $('#teamNames').value = s.teamNames || '';
   for (const [id, v] of Object.entries(s.opts || {})) { const c = document.getElementById(id); if (c) { c.checked = v; c.closest('.opt').classList.toggle('on', v); } }
   setMode(s.mode === 'per' ? 'per' : 'teams');
@@ -474,6 +674,7 @@ function generate() {
   if (K < 1) return;
 
   const balance = $('#chkSkill').checked;
+  const useCap = $('#chkCap').checked;
   const useNG = $('#chkNG').checked, useMust = $('#chkMust').checked;
   const present = new Set(names);
   const validPair = p => p[0] && p[1] && p[0] !== p[1] && present.has(p[0]) && present.has(p[1]);
@@ -497,6 +698,23 @@ function generate() {
   for (const u of units) if (u.size > base + (extra ? 1 : 0))
     return showMsg(`คู่บังคับรวมกันได้ ${u.size} คน ใหญ่กว่าขนาดทีม (${base + (extra ? 1 : 0)} คน) — เพิ่มขนาดทีมหรือลดคู่บังคับ`);
 
+  const caps = useCap ? state.caps.filter(n => present.has(n)) : [];
+  if (caps.length > K) return showMsg(`เลือกหัวหน้าทีมไว้ ${caps.length} คน แต่แบ่งได้แค่ ${K} ทีม — ลดหัวหน้าหรือเพิ่มจำนวนทีม`);
+  for (const u of units) {
+    const inUnit = u.members.filter(n => caps.includes(n));
+    if (inUnit.length > 1) return showMsg(`"${inUnit[0]}" กับ "${inUnit[1]}" เป็นหัวหน้าทีมทั้งคู่แต่ถูกบังคับให้อยู่ทีมเดียวกัน`);
+  }
+  const isCap = n => caps.includes(n);
+  const pin = {};                       // index ทีม -> ชื่อหัวหน้าที่ระบุไว้
+  for (const n of caps) {
+    const ti = state.capTeam[n];
+    if (ti == null || ti >= K) continue;
+    if (pin[ti]) return showMsg(`${teamLabel(ti)} ถูกกำหนดหัวหน้าไว้ 2 คน ("${pin[ti]}" กับ "${n}")`);
+    pin[ti] = n;
+  }
+  const pinnedNames = new Set(Object.values(pin));
+  const freeCaps = caps.filter(n => !pinnedNames.has(n));
+
   const teamOK = (team, u) => u.members.every(a => team.members.every(b => !conflict(a, b)));
 
   const score = teams => {
@@ -510,7 +728,12 @@ function generate() {
 
   const attempt = () => {
     const teams = Array.from({ length: K }, () => ({ members: [], skill: 0 }));
-    const order = shuffle(units.slice());
+    const seeded = new Set();
+    const seat = (ti, u) => { teams[ti].members.push(...u.members); teams[ti].skill += u.skill; seeded.add(u); };
+    for (const ti of Object.keys(pin)) seat(+ti, unitOf[pin[ti]]);
+    const openTeams = shuffle([...Array(K).keys()].filter(i => !(i in pin)));
+    shuffle(freeCaps.map(n => unitOf[n])).forEach((u, i) => { if (openTeams[i] != null) seat(openTeams[i], u); });
+    const order = shuffle(units.filter(u => !seeded.has(u)));
     // stable sort: bigger units first; when balancing also stronger units first (snake-like greedy)
     order.sort((a, b) => b.size - a.size || (balance ? b.skill - a.skill : 0));
     for (const u of order) {
@@ -542,7 +765,7 @@ function generate() {
       if (i === j) continue;
       const A = best[i], B = best[j];
       const a = pick(A.members), b = pick(B.members);
-      if (!a || !b || unitOf[a].size > 1 || unitOf[b].size > 1) continue;
+      if (!a || !b || unitOf[a].size > 1 || unitOf[b].size > 1 || isCap(a) || isCap(b)) continue;
       const ai = A.members.indexOf(a), bi = B.members.indexOf(b);
       A.members[ai] = b; B.members[bi] = a;
       A.skill += skillOf(b) - skillOf(a); B.skill += skillOf(a) - skillOf(b);
@@ -559,7 +782,9 @@ function generate() {
   const teams = best.map((t, i) => {
     const members = shuffle(t.members.slice());
     let leader = null;
-    if (wantLeader) {
+    const own = members.find(isCap);
+    if (own) leader = own;
+    else if (wantLeader) {
       if (balance) { const top = Math.max(...members.map(skillOf)); leader = pick(members.filter(n => skillOf(n) === top)); }
       else leader = pick(members);
     }
@@ -567,8 +792,14 @@ function generate() {
     return { name: teamLabel(i), color: COLORS[i % COLORS.length], members, leader, avg: members.length ? t.skill / members.length : 0 };
   });
   const organizer = $('#chkOrg').checked ? pick(names) : null;
-  state.result = { teams, organizer, balance };
-  renderResult();
+  state.result = { teams, organizer, balance, caps };
+  return true;
+}
+function run(mode) {
+  $('#msg').className = 'msg';
+  if (!generate()) return;
+  if (mode === 'draw') { $('#results').style.display = 'none'; startDraw(); }
+  else { $('#drawStage').style.display = 'none'; renderResult(); }
 }
 
 /* ---------- render result ---------- */
@@ -584,11 +815,143 @@ function renderResult() {
       <ul>${t.members.map(n => `<li><span class="nm">${n === t.leader ? '👑 ' : ''}${esc(n)}</span>${r.balance ? `<span class="lv">Lv.${skillOf(n)}</span>` : ''}</li>`).join('')}</ul>
       ${r.balance ? `<div class="team-f">เฉลี่ย ★ ${t.avg.toFixed(1)}</div>` : ''}
     </div>`).join('');
-  $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if ($('#drawStage').style.display !== 'block') $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-$('#btnGo').onclick = generate;
-$('#btnAgain').onclick = generate;
+$('#btnGo').onclick = () => run('instant');
+$('#btnDrawGo').onclick = () => run('draw');
+$('#btnAgain').onclick = () => run('instant');
+
+/* ---------- โหมดจับฉลาก ---------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const draw = { queue: [], i: 0, auto: false, busy: false, sound: true, caps: 0 };
+let audio = null;
+function beep(freq, dur, type = 'sine') {
+  if (!draw.sound) return;
+  try {
+    audio ||= new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, audio.currentTime);
+    g.gain.exponentialRampToValueAtTime(.18, audio.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + dur);
+    o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + dur + .02);
+  } catch {}
+}
+const centerIn = el => {
+  const a = $('#arena').getBoundingClientRect(), b = el.getBoundingClientRect();
+  return { x: b.left - a.left + b.width / 2, y: b.top - a.top + b.height / 2 };
+};
+const place = (el, p) => { el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, -50%)`; };
+
+function renderBoard() {
+  $('#board').innerHTML = state.result.teams.map(t => `
+    <div class="gcol">
+      <div class="gh" style="background:${t.color}">${esc(t.name)}</div>
+      ${t.members.map((_, i) => `<div class="gslot"><span class="n">${i + 1}</span><span class="v">—</span></div>`).join('')}
+    </div>`).join('');
+}
+function renderBowl() {
+  const left = draw.queue.length - draw.i;
+  $('#bowl').innerHTML = Array.from({ length: left }, () => '<span class="mini"></span>').join('') +
+    `<span class="left">เหลือ ${left} ใบ</span>`;
+  $('#drawStep').textContent = `${draw.i} / ${draw.queue.length}`;
+  $('#drawPhase').textContent = draw.caps
+    ? (draw.i < draw.caps ? '👑 รอบหัวหน้าทีม ' + (draw.i + 1) + '/' + draw.caps : 'รอบสมาชิก')
+    : '';
+  const done = draw.i >= draw.queue.length;
+  $('#btnDrawOne').disabled = done; $('#btnAuto').disabled = done; $('#btnSkip').disabled = done;
+}
+function startDraw() {
+  const r = state.result;
+  $('#drawStage').style.display = 'block';
+  const capSet = new Set(r.caps || []);
+  const capQ = shuffle(r.teams.map((t, ti) => ({ n: t.members.find(n => capSet.has(n)), ti })).filter(x => x.n));
+  const rest = shuffle(r.teams.flatMap((t, ti) => t.members.filter(n => !capSet.has(n)).map(n => ({ n, ti }))));
+  draw.queue = [...capQ, ...rest]; draw.caps = capQ.length;
+  draw.i = 0; draw.auto = false; draw.busy = false;
+  $('#drawStage').classList.toggle('capround', draw.caps > 0);
+  $('#btnAuto').textContent = '▶️ เล่นอัตโนมัติ';
+  $('#podiumTop').textContent = 'กดที่โถเพื่อจับฉลาก';
+  $('#token').style.display = 'none';
+  renderBoard(); renderBowl();
+  $('#drawStage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function fillSlot(slot, item) {
+  const t = state.result.teams[item.ti];
+  slot.classList.add('filled');
+  slot.querySelector('.v').innerHTML = (item.n === t.leader ? '👑 ' : '') + esc(item.n) +
+    (state.result.balance ? ` <span class="lv" style="font-size:11px;opacity:.7">Lv.${skillOf(item.n)}</span>` : '');
+}
+async function drawOne() {
+  if (draw.busy || draw.i >= draw.queue.length) return;
+  draw.busy = true;
+  const item = draw.queue[draw.i], tok = $('#token'), bowl = $('#bowl');
+  $('#podiumTop').textContent = 'กำลังจับ…';
+  bowl.classList.add('shake'); beep(440, .09, 'triangle');
+  await sleep(draw.auto ? 300 : 430); bowl.classList.remove('shake');
+  bowl.querySelector('.mini')?.remove();
+
+  tok.className = 'token'; tok.style.display = 'flex';
+  tok.querySelector('.ball').textContent = draw.i + 1;
+  tok.querySelector('.card').textContent = item.n;
+  const isCapTurn = draw.i < draw.caps;
+  tok.classList.toggle('cap', isCapTurn);
+  if (isCapTurn) tok.querySelector('.card').textContent = '👑 ' + item.n;
+  place(tok, centerIn(bowl));
+  await sleep(40);
+  tok.classList.add('move');
+  place(tok, centerIn($('#podiumTop')));
+  await sleep(730);
+  tok.classList.add('reveal'); beep(880, .16);
+  $('#podiumTop').textContent = '';
+  await sleep(draw.auto ? 550 : 950);
+
+  const col = $('#board').children[item.ti];
+  col.classList.add('hot'); beep(620, .1);
+  const slot = [...col.querySelectorAll('.gslot')].find(x => !x.classList.contains('filled'));
+  await sleep(draw.auto ? 220 : 380);
+  place(tok, centerIn(slot)); tok.classList.add('shrink');
+  await sleep(560);
+  fillSlot(slot, item); slot.classList.add('pop'); beep(720, .12);
+  tok.style.display = 'none'; col.classList.remove('hot');
+  $('#podiumTop').textContent = 'กดที่โถเพื่อจับฉลาก';
+
+  draw.i++; renderBowl(); draw.busy = false;
+  if (draw.i >= draw.queue.length) finishDraw();
+  else if (draw.auto) drawOne();
+}
+function finishDraw() {
+  draw.auto = false; $('#btnAuto').textContent = '▶️ เล่นอัตโนมัติ';
+  $('#podiumTop').textContent = '🎉 จับฉลากครบแล้ว';
+  [880, 1100, 1320].forEach((f, i) => setTimeout(() => beep(f, .18), i * 130));
+  renderResult();
+}
+$('#bowl').onclick = () => drawOne();
+$('#bowl').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); drawOne(); } };
+$('#btnDrawOne').onclick = () => drawOne();
+$('#btnAuto').onclick = () => {
+  draw.auto = !draw.auto;
+  $('#btnAuto').textContent = draw.auto ? '⏸️ หยุดชั่วคราว' : '▶️ เล่นอัตโนมัติ';
+  if (draw.auto) drawOne();
+};
+$('#btnSkip').onclick = () => {
+  draw.auto = false; $('#btnAuto').textContent = '▶️ เล่นอัตโนมัติ';
+  $('#token').style.display = 'none';
+  while (draw.i < draw.queue.length) {
+    const item = draw.queue[draw.i];
+    const col = $('#board').children[item.ti];
+    fillSlot([...col.querySelectorAll('.gslot')].find(x => !x.classList.contains('filled')), item);
+    draw.i++;
+  }
+  renderBowl(); draw.busy = false; finishDraw();
+};
+$('#btnDrawAgain').onclick = () => run('draw');
+$('#btnSound').onclick = () => {
+  draw.sound = !draw.sound;
+  $('#btnSound').textContent = draw.sound ? '🔊 เสียง' : '🔇 ปิดเสียง';
+  $('#btnSound').setAttribute('aria-pressed', draw.sound);
+};
 
 /* ---------- export ---------- */
 function resultText() {
