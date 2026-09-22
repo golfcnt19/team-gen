@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>สุ่มแบ่งทีม</title>
+<meta name="description" content="สุ่มแบ่งรายชื่อเป็นทีมอย่างยุติธรรม รองรับปรับสมดุลทักษะ คู่ห้ามอยู่ด้วยกัน คู่บังคับ เลือกหัวหน้าทีม ทำงานบนเบราว์เซอร์ทั้งหมด">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f3ef; --card:#ffffff; --text:#1b1b1f; --muted:#6c6c73; --line:#e4e2dc;
+  --soft:#f1efea; --soft2:#e9e7e1; --accent:#1b1b1f; --accent-text:#ffffff;
+  --focus:#2f6fed; --danger:#d0393e; --danger-soft:#fdeceb; --ok:#1f9d5c;
+  --radius:16px; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121215; --card:#1c1c20; --text:#f1f1f3; --muted:#9c9ca4; --line:#2c2c32;
+    --soft:#24242a; --soft2:#2c2c33; --accent:#f1f1f3; --accent-text:#121215;
+    --danger:#f26b6f; --danger-soft:#3a2224; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121215; --card:#1c1c20; --text:#f1f1f3; --muted:#9c9ca4; --line:#2c2c32;
+  --soft:#24242a; --soft2:#2c2c33; --accent:#f1f1f3; --accent-text:#121215;
+  --danger:#f26b6f; --danger-soft:#3a2224; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px; margin:0 auto; padding:28px 16px 64px}
+header{margin-bottom:20px}
+h1{font-size:28px; margin:0 0 4px; letter-spacing:-.01em}
+.sub{color:var(--muted); margin:0}
+.panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:16px}
+label.block{display:block; font-weight:600; margin-bottom:8px}
+textarea{
+  width:100%; min-height:200px; resize:vertical; padding:14px; font:inherit; font-size:16px;
+  color:var(--text); background:var(--soft); border:1px solid var(--line); border-radius:12px; outline:none;
+}
+textarea:focus, input:focus, select:focus{border-color:var(--focus); box-shadow:0 0 0 3px color-mix(in srgb, var(--focus) 20%, transparent)}
+.hint{color:var(--muted); font-size:13px; margin-top:6px}
+.toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px}
+.pill{background:var(--soft); border-radius:999px; padding:6px 12px; font-size:14px; color:var(--muted)}
+.pill b{color:var(--text)}
+.spacer{flex:1}
+button{
+  font:inherit; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--text);
+  border-radius:10px; padding:8px 14px; font-size:14px; transition:background .15s, transform .05s;
+}
+button:hover{background:var(--soft)}
+button:active{transform:translateY(1px)}
+button.ghost{border-color:transparent; background:transparent}
+button.ghost:hover{background:var(--soft)}
+button.danger{color:var(--danger)}
+button.danger:hover{background:var(--danger-soft)}
+button.primary{
+  width:100%; background:var(--accent); color:var(--accent-text); border-color:var(--accent);
+  font-size:17px; font-weight:600; padding:15px; border-radius:14px; margin-top:16px;
+}
+button.primary:hover{opacity:.9}
+button:disabled{opacity:.5; cursor:not-allowed}
+.row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+.seg{display:inline-flex; background:var(--soft); border-radius:12px; padding:4px; gap:4px}
+.seg button{border:none; background:transparent; padding:8px 16px; border-radius:9px; color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.12); font-weight:600}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.stepper button{border:none; border-radius:0; width:38px; height:38px; padding:0; font-size:18px}
+.stepper input{
+  width:56px; height:38px; text-align:center; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line);
+  font:inherit; font-size:16px; background:var(--card); color:var(--text); outline:none; -moz-appearance:textfield;
+}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+details.adv{margin-top:16px; border-top:1px solid var(--line); padding-top:8px}
+details.adv summary{cursor:pointer; list-style:none; text-align:center; color:var(--muted); padding:8px; user-select:none}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary::after{content:" ▾"; font-size:12px}
+details.adv[open] summary::after{content:" ▴"}
+.opt{border-top:1px solid var(--line); padding:12px 4px}
+.opt:first-of-type{border-top:none}
+.opt-head{display:flex; align-items:center; gap:10px}
+.opt-head input[type=checkbox]{width:18px; height:18px; accent-color:var(--focus); cursor:pointer}
+.opt-head label{cursor:pointer; flex:1; font-weight:500}
+.opt-head .desc{color:var(--muted); font-size:12px}
+.opt-body{display:none; margin-top:12px}
+.opt.on .opt-body{display:block}
+.skill-list{max-height:280px; overflow:auto; border:1px solid var(--line); border-radius:12px; background:var(--soft)}
+.skill-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line)}
+.skill-row:last-child{border-bottom:none}
+.skill-row .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.stars{display:inline-flex; gap:2px; flex-shrink:0}
+.stars button{border:none; background:none; padding:2px; font-size:18px; line-height:1; color:var(--line); cursor:pointer}
+.stars button.on{color:#f5a623}
+.stars button:hover{background:none; transform:scale(1.15)}
+.pairs{display:flex; flex-direction:column; gap:8px}
+.pair{display:flex; gap:8px; align-items:center}
+.pair select{
+  flex:1; min-width:0; font:inherit; font-size:14px; padding:8px 10px; border:1px solid var(--line); border-radius:10px;
+  background:var(--card); color:var(--text); outline:none;
+}
+.pair .x{width:34px; height:34px; padding:0; border-radius:50%; color:var(--muted); flex-shrink:0}
+.add-pair{width:100%; border-style:dashed}
+.names-input{
+  width:100%; font:inherit; font-size:14px; padding:9px 12px; border:1px solid var(--line); border-radius:10px;
+  background:var(--card); color:var(--text); outline:none;
+}
+.msg{margin-top:12px; padding:10px 14px; border-radius:10px; font-size:14px; display:none}
+.msg.warn{display:block; background:var(--danger-soft); color:var(--danger)}
+/* results */
+#results{display:none}
+.res-head{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+.res-head h2{margin:0; font-size:20px; flex:1}
+.organizer{
+  display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#fff3cd,#ffe08a); color:#5a4300;
+  border-radius:12px; padding:12px 16px; margin-bottom:14px; font-weight:500;
+}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px}
+.team{border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); animation:pop .25s ease both}
+@keyframes pop{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.team-h{display:flex; align-items:center; justify-content:space-between; padding:10px 14px; color:#fff; font-weight:600}
+.team-h .cnt{background:rgba(255,255,255,.25); border-radius:999px; padding:1px 9px; font-size:12px; font-weight:500}
+.team ul{list-style:none; margin:0; padding:6px 8px}
+.team li{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 8px; border-radius:8px}
+.team li:nth-child(odd){background:var(--soft)}
+.team li .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.team li .lv{font-size:11px; color:var(--muted); background:var(--soft2); border-radius:6px; padding:1px 6px; flex-shrink:0}
+.team-f{border-top:1px solid var(--line); padding:8px 14px; font-size:12px; color:var(--muted); text-align:center; background:var(--soft)}
+.toast{
+  position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px); background:var(--accent); color:var(--accent-text);
+  padding:10px 18px; border-radius:999px; font-size:14px; opacity:0; pointer-events:none; transition:.25s; z-index:9;
+}
+.toast.show{opacity:1; transform:translateX(-50%)}
+footer{color:var(--muted); font-size:13px; text-align:center; margin-top:32px}
+@media (max-width:520px){
+  .panel{padding:16px}
+  .seg{width:100%}
+  .seg button{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎲 สุ่มแบ่งทีม</h1>
+    <p class="sub">แบ่งรายชื่อเป็นทีมแบบสุ่มและยุติธรรม รองรับปรับสมดุลทักษะ คู่ห้ามอยู่ด้วยกัน คู่บังคับ และเลือกหัวหน้าทีม — ข้อมูลอยู่ในเบราว์เซอร์ของคุณเท่านั้น</p>
+  </header>
+
+  <section class="panel">
+    <label class="block" for="names">รายชื่อสมาชิก <span class="hint" style="display:inline;font-weight:400">(บรรทัดละ 1 คน)</span></label>
+    <textarea id="names" placeholder="สมชาย ใจดี&#10;สมหญิง รักดี&#10;มานะ ขยัน&#10;…&#10;&#10;ใส่ระดับทักษะต่อท้ายได้ เช่น  สมชาย ใจดี, 4" spellcheck="false"></textarea>
+    <div class="hint">เคล็ดลับ: พิมพ์ <code>ชื่อ, 4</code> เพื่อกำหนดระดับทักษะ 1–5 ไปพร้อมกัน</div>
+    <div class="toolbar">
+      <span class="pill">จำนวน: <b id="count">0</b> คน<span id="dup"></span></span>
+      <span class="spacer"></span>
+      <button id="btnExample" class="ghost">✨ ตัวอย่าง</button>
+      <button id="btnLoad">📂 โหลด</button>
+      <button id="btnSave">💾 บันทึก</button>
+      <button id="btnClear" class="danger ghost">ล้าง</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="row">
+      <div class="seg" role="group" aria-label="วิธีแบ่ง">
+        <button id="modeTeams" aria-pressed="true">แบ่งตามจำนวนทีม</button>
+        <button id="modePer" aria-pressed="false">แบ่งตามจำนวนคน</button>
+      </div>
+      <span class="spacer"></span>
+      <div class="row" style="gap:8px">
+        <span id="stepLabel">จำนวนทีม:</span>
+        <div class="stepper">
+          <button id="stepMinus" aria-label="ลด">−</button>
+          <input id="stepVal" type="number" min="1" value="2" inputmode="numeric">
+          <button id="stepPlus" aria-label="เพิ่ม">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="hint" id="modeHint">จะได้ทีมละประมาณ — คน</div>
+
+    <details class="adv" id="adv">
+      <summary>⚙️ ตัวเลือกขั้นสูง</summary>
+
+      <div class="opt" id="optNames">
+        <div class="opt-head">
+          <input type="checkbox" id="chkNames">
+          <label for="chkNames">ตั้งชื่อทีมเอง</label>
+          <span class="desc">คั่นด้วยจุลภาค</span>
+        </div>
+        <div class="opt-body">
+          <input id="teamNames" class="names-input" placeholder="เช่น แดง, น้ำเงิน, เขียว, เหลือง">
+        </div>
+      </div>
+
+      <div class="opt" id="optSkill">
+        <div class="opt-head">
+          <input type="checkbox" id="chkSkill">
+          <label for="chkSkill">ปรับสมดุลทักษะ</label>
+          <span class="desc">ให้คะแนน ★1–5 แล้วระบบจะเกลี่ยให้แต่ละทีมใกล้เคียงกัน</span>
+        </div>
+        <div class="opt-body">
+          <div class="skill-list" id="skillList"></div>
+        </div>
+      </div>
+
+      <div class="opt" id="optNG">
+        <div class="opt-head">
+          <input type="checkbox" id="chkNG">
+          <label for="chkNG">คู่ที่ไม่ต้องการ (NG Pairs)</label>
+          <span class="desc">ห้ามอยู่ทีมเดียวกัน</span>
+        </div>
+        <div class="opt-body">
+          <div class="pairs" id="ngList"></div>
+          <button class="add-pair" data-add="ng" style="margin-top:8px">+ เพิ่มคู่</button>
+        </div>
+      </div>
+
+      <div class="opt" id="optMust">
+        <div class="opt-head">
+          <input type="checkbox" id="chkMust">
+          <label for="chkMust">คู่บังคับ (Must Pairs)</label>
+          <span class="desc">ต้องอยู่ทีมเดียวกัน</span>
+        </div>
+        <div class="opt-body">
+          <div class="pairs" id="mustList"></div>
+          <button class="add-pair" data-add="must" style="margin-top:8px">+ เพิ่มคู่</button>
+        </div>
+      </div>
+
+      <div class="opt" id="optLeader">
+        <div class="opt-head">
+          <input type="checkbox" id="chkLeader">
+          <label for="chkLeader">เลือกหัวหน้าทีมอัตโนมัติ</label>
+          <span class="desc">ผู้ที่มีทักษะสูงสุด (หรือสุ่มถ้าไม่ปรับสมดุล)</span>
+        </div>
+      </div>
+
+      <div class="opt" id="optOrg">
+        <div class="opt-head">
+          <input type="checkbox" id="chkOrg">
+          <label for="chkOrg">เลือกผู้จัดงาน</label>
+          <span class="desc">สุ่ม 1 คนจากทั้งหมด</span>
+        </div>
+      </div>
+    </details>
+
+    <div class="msg" id="msg"></div>
+    <button class="primary" id="btnGo">🎲 สุ่มแบ่งทีมเลย</button>
+  </section>
+
+  <section class="panel" id="results">
+    <div class="res-head">
+      <h2>ผลลัพธ์</h2>
+      <button id="btnAgain">🔄 สุ่มใหม่</button>
+      <button id="btnCopy">📋 ข้อความ</button>
+      <button id="btnCSV">📊 CSV</button>
+      <button id="btnPNG">🖼️ บันทึกรูปภาพ</button>
+    </div>
+    <div class="organizer" id="organizer" style="display:none"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>ประมวลผลบนเบราว์เซอร์ทั้งหมด ไม่มีการส่งข้อมูลไปที่ใด · สุ่มด้วย Fisher–Yates</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const COLORS = ['#e5484d','#f76b15','#e5a800','#30a46c','#12a594','#0091ff','#6e56cf','#e93d82','#8e4ec6','#ad7f58','#3e63dd','#5bb98c'];
+const SAVE_KEY = 'teamgen:saved', DRAFT_KEY = 'teamgen:draft';
+
+const state = {
+  mode: 'teams',        // 'teams' | 'per'
+  skills: {},           // name -> 1..5
+  ng: [], must: [],     // [[a,b], ...]
+  result: null,
+};
+
+/* ---------- helpers ---------- */
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const skillOf = n => state.skills[n] || 3;
+const toast = t => { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1800); };
+const showMsg = (t, kind = 'warn') => { const m = $('#msg'); m.textContent = t || ''; m.className = 'msg' + (t ? ' ' + kind : ''); };
+const store = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+
+/* ---------- parse names ---------- */
+function parseNames() {
+  const seen = new Set(), names = []; let dup = 0;
+  for (const raw of $('#names').value.split(/\r?\n/)) {
+    let s = raw.trim(); if (!s) continue;
+    const m = s.match(/^(.*?)\s*[,:\t]\s*([1-5])$/);
+    let name = s;
+    if (m) { name = m[1].trim(); state.skills[name] = +m[2]; }
+    if (!name) continue;
+    if (seen.has(name)) { dup++; continue; }
+    seen.add(name); names.push(name);
+  }
+  return { names, dup };
+}
+
+function teamLabel(i) {
+  if ($('#chkNames').checked) {
+    const custom = $('#teamNames').value.split(',').map(s => s.trim()).filter(Boolean);
+    if (custom[i]) return custom[i];
+  }
+  return 'ทีม ' + (i < 26 ? String.fromCharCode(65 + i) : i + 1);
+}
+
+/* ---------- UI: names / count / hint ---------- */
+function refreshNames() {
+  const { names, dup } = parseNames();
+  $('#count').textContent = names.length;
+  $('#dup').textContent = dup ? ` · ตัดชื่อซ้ำออก ${dup}` : '';
+  refreshHint(names.length);
+  renderSkills(names);
+  renderPairs('ng', names); renderPairs('must', names);
+  store.set(DRAFT_KEY, snapshot());
+}
+function refreshHint(N = parseNames().names.length) {
+  const v = Math.max(1, +$('#stepVal').value || 1);
+  let text;
+  if (state.mode === 'teams') {
+    const per = N ? Math.floor(N / v) : 0, extra = N % v;
+    text = N ? `จะได้ ${v} ทีม ทีมละ ${per}${extra ? `–${per + 1}` : ''} คน` : 'ใส่รายชื่อก่อน';
+  } else {
+    const k = N ? Math.ceil(N / v) : 0;
+    text = N ? `จะได้ ${k} ทีม ทีมละประมาณ ${v} คน` : 'ใส่รายชื่อก่อน';
+  }
+  $('#modeHint').textContent = text;
+}
+
+/* ---------- UI: skills ---------- */
+function renderSkills(names) {
+  const box = $('#skillList');
+  if (!names.length) { box.innerHTML = '<div class="skill-row" style="color:var(--muted)">ยังไม่มีรายชื่อ</div>'; return; }
+  box.innerHTML = names.map(n => `
+    <div class="skill-row" data-name="${esc(n)}">
+      <span class="nm">${esc(n)}</span>
+      <span class="stars">${[1,2,3,4,5].map(i => `<button data-lv="${i}" class="${i <= skillOf(n) ? 'on' : ''}" aria-label="${i} ดาว">★</button>`).join('')}</span>
+    </div>`).join('');
+}
+$('#skillList').addEventListener('click', e => {
+  const b = e.target.closest('button[data-lv]'); if (!b) return;
+  const row = b.closest('.skill-row'), name = row.dataset.name, lv = +b.dataset.lv;
+  state.skills[name] = lv;
+  row.querySelectorAll('button').forEach(x => x.classList.toggle('on', +x.dataset.lv <= lv));
+  store.set(DRAFT_KEY, snapshot());
+});
+
+/* ---------- UI: pairs ---------- */
+function renderPairs(kind, names) {
+  const box = $(kind === 'ng' ? '#ngList' : '#mustList');
+  const list = state[kind];
+  const opts = sel => `<option value="">— เลือก —</option>` + names.map(n => `<option value="${esc(n)}" ${n === sel ? 'selected' : ''}>${esc(n)}</option>`).join('');
+  box.innerHTML = list.map((p, i) => `
+    <div class="pair" data-i="${i}">
+      <select data-k="0">${opts(p[0])}</select>
+      <span style="color:var(--muted)">${kind === 'ng' ? '✕' : '＋'}</span>
+      <select data-k="1">${opts(p[1])}</select>
+      <button class="x ghost" aria-label="ลบคู่">✕</button>
+    </div>`).join('') || `<div class="hint">ยังไม่มีคู่ กด "+ เพิ่มคู่"</div>`;
+}
+document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+  state[b.dataset.add].push(['', '']);
+  renderPairs(b.dataset.add, parseNames().names);
+}));
+for (const kind of ['ng', 'must']) {
+  const box = $(kind === 'ng' ? '#ngList' : '#mustList');
+  box.addEventListener('change', e => {
+    const s = e.target.closest('select'); if (!s) return;
+    const i = +s.closest('.pair').dataset.i; state[kind][i][+s.dataset.k] = s.value;
+    store.set(DRAFT_KEY, snapshot());
+  });
+  box.addEventListener('click', e => {
+    const x = e.target.closest('button.x'); if (!x) return;
+    state[kind].splice(+x.closest('.pair').dataset.i, 1);
+    renderPairs(kind, parseNames().names);
+    store.set(DRAFT_KEY, snapshot());
+  });
+}
+
+/* ---------- option toggles ---------- */
+document.querySelectorAll('.opt-head input[type=checkbox]').forEach(c => {
+  c.addEventListener('change', () => { c.closest('.opt').classList.toggle('on', c.checked); store.set(DRAFT_KEY, snapshot()); });
+});
+$('#teamNames').addEventListener('input', () => store.set(DRAFT_KEY, snapshot()));
+
+/* ---------- mode & stepper ---------- */
+function setMode(m) {
+  state.mode = m;
+  $('#modeTeams').setAttribute('aria-pressed', m === 'teams');
+  $('#modePer').setAttribute('aria-pressed', m === 'per');
+  $('#stepLabel').textContent = m === 'teams' ? 'จำนวนทีม:' : 'คน/ทีม:';
+  refreshHint(); store.set(DRAFT_KEY, snapshot());
+}
+$('#modeTeams').onclick = () => setMode('teams');
+$('#modePer').onclick = () => setMode('per');
+$('#stepMinus').onclick = () => { $('#stepVal').value = Math.max(1, (+$('#stepVal').value || 1) - 1); refreshHint(); store.set(DRAFT_KEY, snapshot()); };
+$('#stepPlus').onclick = () => { $('#stepVal').value = (+$('#stepVal').value || 1) + 1; refreshHint(); store.set(DRAFT_KEY, snapshot()); };
+$('#stepVal').addEventListener('input', () => { refreshHint(); store.set(DRAFT_KEY, snapshot()); });
+
+/* ---------- names textarea events ---------- */
+let t; $('#names').addEventListener('input', () => { clearTimeout(t); t = setTimeout(refreshNames, 150); });
+
+$('#btnExample').onclick = () => {
+  $('#names').value = ['สมชาย ใจดี','สมหญิง รักดี','มานะ ขยัน','มานี มีใจ','ปิติ ยินดี','ชูใจ น่ารัก','วีระ กล้าหาญ','เพ็ญศรี ดีงาม','อำนาจ ยิ่งใหญ่','สุชาติ ชาติเจริญ'].join('\n');
+  refreshNames(); toast('ใส่รายชื่อตัวอย่างแล้ว');
+};
+$('#btnClear').onclick = () => {
+  if ($('#names').value.trim() && !confirm('ล้างรายชื่อและเงื่อนไขทั้งหมด?')) return;
+  $('#names').value = ''; state.skills = {}; state.ng = []; state.must = []; state.result = null;
+  $('#results').style.display = 'none'; showMsg(''); refreshNames();
+};
+
+/* ---------- save / load ---------- */
+function snapshot() {
+  return {
+    names: $('#names').value, skills: state.skills, ng: state.ng, must: state.must,
+    mode: state.mode, step: +$('#stepVal').value || 1,
+    opts: Object.fromEntries([...document.querySelectorAll('.opt-head input')].map(c => [c.id, c.checked])),
+    teamNames: $('#teamNames').value,
+  };
+}
+function restore(s) {
+  if (!s) return false;
+  $('#names').value = s.names || '';
+  state.skills = s.skills || {}; state.ng = s.ng || []; state.must = s.must || [];
+  $('#stepVal').value = s.step || 2; $('#teamNames').value = s.teamNames || '';
+  for (const [id, v] of Object.entries(s.opts || {})) { const c = document.getElementById(id); if (c) { c.checked = v; c.closest('.opt').classList.toggle('on', v); } }
+  setMode(s.mode === 'per' ? 'per' : 'teams');
+  refreshNames();
+  return true;
+}
+$('#btnSave').onclick = () => { store.set(SAVE_KEY, snapshot()); toast('บันทึกรายชื่อไว้ในเบราว์เซอร์นี้แล้ว'); };
+$('#btnLoad').onclick = () => { restore(store.get(SAVE_KEY)) ? toast('โหลดรายชื่อที่บันทึกไว้แล้ว') : toast('ยังไม่มีรายชื่อที่บันทึกไว้'); };
+
+/* ---------- core algorithm ---------- */
+function generate() {
+  showMsg('');
+  const { names } = parseNames();
+  const N = names.length;
+  if (N < 2) return showMsg('ใส่รายชื่ออย่างน้อย 2 คนก่อน');
+
+  const v = Math.max(1, +$('#stepVal').value || 1);
+  const K = state.mode === 'teams' ? Math.min(v, N) : Math.ceil(N / v);
+  if (K < 1) return;
+
+  const balance = $('#chkSkill').checked;
+  const useNG = $('#chkNG').checked, useMust = $('#chkMust').checked;
+  const present = new Set(names);
+  const validPair = p => p[0] && p[1] && p[0] !== p[1] && present.has(p[0]) && present.has(p[1]);
+  const ngPairs = useNG ? state.ng.filter(validPair) : [];
+  const mustPairs = useMust ? state.must.filter(validPair) : [];
+
+  // union-find for must pairs → units
+  const parent = {}; names.forEach(n => parent[n] = n);
+  const find = x => parent[x] === x ? x : (parent[x] = find(parent[x]));
+  for (const [a, b] of mustPairs) parent[find(a)] = find(b);
+  const unitMap = {};
+  for (const n of names) (unitMap[find(n)] ||= []).push(n);
+  const units = Object.values(unitMap).map(members => ({ members, size: members.length, skill: members.reduce((s, n) => s + skillOf(n), 0) }));
+  const unitOf = {}; units.forEach(u => u.members.forEach(n => unitOf[n] = u));
+
+  const ngSet = new Set(); ngPairs.forEach(([a, b]) => { ngSet.add(a + ' ' + b); ngSet.add(b + ' ' + a); });
+  const conflict = (a, b) => ngSet.has(a + ' ' + b);
+  for (const u of units) for (const a of u.members) for (const b of u.members) if (a < b && conflict(a, b))
+    return showMsg(`"${a}" กับ "${b}" อยู่ทั้งในคู่บังคับและคู่ที่ไม่ต้องการ — แก้เงื่อนไขก่อน`);
+  const base = Math.floor(N / K), extra = N % K;
+  for (const u of units) if (u.size > base + (extra ? 1 : 0))
+    return showMsg(`คู่บังคับรวมกันได้ ${u.size} คน ใหญ่กว่าขนาดทีม (${base + (extra ? 1 : 0)} คน) — เพิ่มขนาดทีมหรือลดคู่บังคับ`);
+
+  const teamOK = (team, u) => u.members.every(a => team.members.every(b => !conflict(a, b)));
+
+  const score = teams => {
+    let ng = 0, sizes = teams.map(t => t.members.length);
+    for (const t of teams) for (let i = 0; i < t.members.length; i++) for (let j = i + 1; j < t.members.length; j++) if (conflict(t.members[i], t.members[j])) ng++;
+    const sizeGap = Math.max(...sizes) - Math.min(...sizes);
+    let spread = 0;
+    if (balance) { const avgs = teams.map(t => t.members.length ? t.skill / t.members.length : 0); spread = Math.max(...avgs) - Math.min(...avgs); }
+    return ng * 1000 + Math.max(0, sizeGap - 1) * 50 + spread;
+  };
+
+  const attempt = () => {
+    const teams = Array.from({ length: K }, () => ({ members: [], skill: 0 }));
+    const order = shuffle(units.slice());
+    // stable sort: bigger units first; when balancing also stronger units first (snake-like greedy)
+    order.sort((a, b) => b.size - a.size || (balance ? b.skill - a.skill : 0));
+    for (const u of order) {
+      const fullCount = teams.filter(t => t.members.length > base).length;
+      const cands = shuffle(teams.slice()).map(t => {
+        const ns = t.members.length + u.size;
+        const over = ns <= base ? 0 : (ns === base + 1 && fullCount < extra ? 0 : ns - base);
+        return { t, over, ok: teamOK(t, u) };
+      });
+      cands.sort((a, b) => (b.ok - a.ok) || (a.over - b.over) || (balance ? a.t.skill - b.t.skill : a.t.members.length - b.t.members.length));
+      const c = cands[0].t;
+      c.members.push(...u.members); c.skill += u.skill;
+    }
+    return teams;
+  };
+
+  let best = null, bestScore = Infinity;
+  const tries = balance || ngPairs.length ? 120 : 1;
+  for (let i = 0; i < tries; i++) {
+    const t = attempt(), s = score(t);
+    if (s < bestScore) { best = t; bestScore = s; }
+    if (s === 0) break;
+  }
+
+  // local search: swap singletons to tighten skill balance
+  if (balance && K > 1) {
+    for (let it = 0; it < 600; it++) {
+      const i = Math.floor(Math.random() * K), j = Math.floor(Math.random() * K);
+      if (i === j) continue;
+      const A = best[i], B = best[j];
+      const a = pick(A.members), b = pick(B.members);
+      if (!a || !b || unitOf[a].size > 1 || unitOf[b].size > 1) continue;
+      const ai = A.members.indexOf(a), bi = B.members.indexOf(b);
+      A.members[ai] = b; B.members[bi] = a;
+      A.skill += skillOf(b) - skillOf(a); B.skill += skillOf(a) - skillOf(b);
+      const s = score(best);
+      if (s < bestScore) bestScore = s;
+      else { A.members[ai] = a; B.members[bi] = b; A.skill += skillOf(a) - skillOf(b); B.skill += skillOf(b) - skillOf(a); }
+    }
+  }
+
+  const ngLeft = Math.floor(bestScore / 1000);
+  if (ngLeft) showMsg(`หลีกเลี่ยงคู่ที่ไม่ต้องการได้ไม่หมด (เหลือ ${ngLeft} คู่ที่ยังอยู่ทีมเดียวกัน) — ลองเพิ่มจำนวนทีม`);
+
+  const wantLeader = $('#chkLeader').checked;
+  const teams = best.map((t, i) => {
+    const members = shuffle(t.members.slice());
+    let leader = null;
+    if (wantLeader) {
+      if (balance) { const top = Math.max(...members.map(skillOf)); leader = pick(members.filter(n => skillOf(n) === top)); }
+      else leader = pick(members);
+    }
+    if (leader) { members.splice(members.indexOf(leader), 1); members.unshift(leader); }
+    return { name: teamLabel(i), color: COLORS[i % COLORS.length], members, leader, avg: members.length ? t.skill / members.length : 0 };
+  });
+  const organizer = $('#chkOrg').checked ? pick(names) : null;
+  state.result = { teams, organizer, balance };
+  renderResult();
+}
+
+/* ---------- render result ---------- */
+function renderResult() {
+  const r = state.result; if (!r) return;
+  $('#results').style.display = 'block';
+  const org = $('#organizer');
+  org.style.display = r.organizer ? 'flex' : 'none';
+  org.innerHTML = r.organizer ? `<span style="font-size:22px">🎉</span><span>ผู้จัดงาน: <b>${esc(r.organizer)}</b></span>` : '';
+  $('#grid').innerHTML = r.teams.map((t, i) => `
+    <div class="team" style="animation-delay:${i * 40}ms">
+      <div class="team-h" style="background:${t.color}"><span>${esc(t.name)}</span><span class="cnt">${t.members.length} คน</span></div>
+      <ul>${t.members.map(n => `<li><span class="nm">${n === t.leader ? '👑 ' : ''}${esc(n)}</span>${r.balance ? `<span class="lv">Lv.${skillOf(n)}</span>` : ''}</li>`).join('')}</ul>
+      ${r.balance ? `<div class="team-f">เฉลี่ย ★ ${t.avg.toFixed(1)}</div>` : ''}
+    </div>`).join('');
+  $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+$('#btnGo').onclick = generate;
+$('#btnAgain').onclick = generate;
+
+/* ---------- export ---------- */
+function resultText() {
+  const r = state.result; const out = [];
+  if (r.organizer) out.push(`🎉 ผู้จัดงาน: ${r.organizer}`, '');
+  for (const t of r.teams) {
+    out.push(`【${t.name}】 ${t.members.length} คน${r.balance ? ` (เฉลี่ย ★${t.avg.toFixed(1)})` : ''}`);
+    for (const n of t.members) out.push(`- ${n}${n === t.leader ? ' 👑' : ''}${r.balance ? ` (Lv.${skillOf(n)})` : ''}`);
+    out.push('');
+  }
+  return out.join('\n').trim();
+}
+$('#btnCopy').onclick = async () => {
+  if (!state.result) return;
+  try { await navigator.clipboard.writeText(resultText()); toast('คัดลอกข้อความแล้ว'); }
+  catch { prompt('คัดลอกข้อความด้านล่าง', resultText()); }
+};
+function download(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+$('#btnCSV').onclick = () => {
+  const r = state.result; if (!r) return;
+  const q = s => `"${String(s).replace(/"/g, '""')}"`;
+  const rows = [['ทีม', 'ชื่อ', 'ทักษะ', 'หัวหน้าทีม']];
+  for (const t of r.teams) for (const n of t.members) rows.push([t.name, n, r.balance ? skillOf(n) : '', n === t.leader ? 'ใช่' : '']);
+  if (r.organizer) rows.push([], ['ผู้จัดงาน', r.organizer]);
+  download('teams.csv', new Blob(['﻿' + rows.map(x => x.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+  toast('ดาวน์โหลด CSV แล้ว');
+};
+
+$('#btnPNG').onclick = async () => {
+  const r = state.result; if (!r) return;
+  await (document.fonts?.ready || Promise.resolve());
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light';
+  const C = dark ? { bg: '#121215', card: '#1c1c20', text: '#f1f1f3', muted: '#9c9ca4', line: '#2c2c32', alt: '#24242a' }
+                 : { bg: '#f4f3ef', card: '#ffffff', text: '#1b1b1f', muted: '#6c6c73', line: '#e4e2dc', alt: '#f1efea' };
+  const CW = 260, PAD = 24, GAP = 16, HEAD = 46, ROW = 32, FOOT = r.balance ? 32 : 0, TOP = 70 + (r.organizer ? 44 : 0);
+  const cols = Math.min(r.teams.length, 4), rowsN = Math.ceil(r.teams.length / cols);
+  const cardH = t => HEAD + t.members.length * ROW + 12 + FOOT;
+  const rowH = []; for (let i = 0; i < rowsN; i++) rowH.push(Math.max(...r.teams.slice(i * cols, i * cols + cols).map(cardH)));
+  const W = PAD * 2 + cols * CW + (cols - 1) * GAP, H = TOP + rowH.reduce((a, b) => a + b + GAP, 0) + PAD;
+  const dpr = 2, cv = document.createElement('canvas'); cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const F = '"Noto Sans Thai", system-ui, sans-serif';
+  const rr = (x, y, w, h, rad, fill) => { g.beginPath(); g.roundRect(x, y, w, h, rad); g.fillStyle = fill; g.fill(); };
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  g.fillStyle = C.text; g.font = `700 24px ${F}`; g.textBaseline = 'middle'; g.fillText('🎲 ผลการแบ่งทีม', PAD, 36);
+  g.fillStyle = C.muted; g.font = `13px ${F}`; g.textAlign = 'right'; g.fillText(new Date().toLocaleString('th-TH'), W - PAD, 36); g.textAlign = 'left';
+  if (r.organizer) { rr(PAD, 58, W - PAD * 2, 34, 10, '#ffe08a'); g.fillStyle = '#5a4300'; g.font = `600 15px ${F}`; g.fillText(`🎉 ผู้จัดงาน: ${r.organizer}`, PAD + 14, 75); }
+  const clip = (s, max) => { if (g.measureText(s).width <= max) return s; while (s.length && g.measureText(s + '…').width > max) s = s.slice(0, -1); return s + '…'; };
+  let y = TOP;
+  r.teams.forEach((t, i) => {
+    const c = i % cols, rIdx = Math.floor(i / cols);
+    if (c === 0 && i) y += rowH[rIdx - 1] + GAP;
+    const x = PAD + c * (CW + GAP), h = cardH(t);
+    rr(x, y, CW, h, 14, C.card);
+    g.save(); g.beginPath(); g.roundRect(x, y, CW, h, 14); g.clip();
+    g.fillStyle = t.color; g.fillRect(x, y, CW, HEAD);
+    g.fillStyle = '#fff'; g.font = `600 16px ${F}`; g.fillText(clip(t.name, CW - 90), x + 14, y + HEAD / 2);
+    g.font = `500 12px ${F}`; g.textAlign = 'right'; g.fillText(`${t.members.length} คน`, x + CW - 14, y + HEAD / 2); g.textAlign = 'left';
+    t.members.forEach((n, k) => {
+      const ry = y + HEAD + 6 + k * ROW;
+      if (k % 2 === 0) rr(x + 8, ry, CW - 16, ROW, 8, C.alt);
+      g.fillStyle = C.text; g.font = `15px ${F}`;
+      g.fillText(clip((n === t.leader ? '👑 ' : '') + n, CW - (r.balance ? 80 : 32)), x + 16, ry + ROW / 2);
+      if (r.balance) { g.fillStyle = C.muted; g.font = `11px ${F}`; g.textAlign = 'right'; g.fillText(`Lv.${skillOf(n)}`, x + CW - 16, ry + ROW / 2); g.textAlign = 'left'; }
+    });
+    if (r.balance) {
+      const fy = y + h - FOOT; g.fillStyle = C.alt; g.fillRect(x, fy, CW, FOOT);
+      g.fillStyle = C.muted; g.font = `12px ${F}`; g.textAlign = 'center'; g.fillText(`เฉลี่ย ★ ${t.avg.toFixed(1)}`, x + CW / 2, fy + FOOT / 2); g.textAlign = 'left';
+    }
+    g.restore();
+  });
+  cv.toBlob(b => { download('teams.png', b); toast('บันทึกรูปภาพแล้ว'); }, 'image/png');
+};
+
+/* ---------- init ---------- */
+if (!restore(store.get(DRAFT_KEY))) refreshNames();
+})();
+</script>
+</body>
+</html>
